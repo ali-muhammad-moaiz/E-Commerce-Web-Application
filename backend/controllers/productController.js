@@ -1,7 +1,9 @@
 const express = require('express');
+const {getAllProductsService} = require('../services/productService');
 
-const getAllProducts = async (req, res)=>{
-    res.status(200).json({message: "The function is working fine!"});
+const getAllProductsController = async (req, res)=>{
+    const result = await getAllProductsService();
+    return res.status(200).json({message: result});
 }
 
-module.exports = {getAllProducts};
+module.exports.getAllProducts = getAllProductsController;
