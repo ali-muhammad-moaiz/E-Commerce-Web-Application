@@ -9,6 +9,4 @@ const product = require('./routes/productRoutes.js');
 
 app.use('/api/product/', product);
 
-
-
 module.exports = app;

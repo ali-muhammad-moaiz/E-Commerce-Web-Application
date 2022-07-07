@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {getAllProducts} = require('../controllers/productController');
+const {createNewProductController, getProductsByDetailsController, getAllProductsController, updateProductController, deleteProductController} = require('../controllers/productController');
 
-router.get('/products', getAllProducts)
-
+router.post('/new', createNewProductController);
+router.get('/products', getAllProductsController);
+router.put('/:id', updateProductController).delete(deleteProductController);    //access by parameter
+router.get('' , getProductsByDetailsController)                                 //access by query
 module.exports = router;
