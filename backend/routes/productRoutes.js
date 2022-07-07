@@ -4,6 +4,7 @@ const {createNewProductController, getProductsByDetailsController, getAllProduct
 
 router.post('/new', createNewProductController);
 router.get('/products', getAllProductsController);
-router.put('/:id', updateProductController).delete(deleteProductController);    //access by parameter
+router.put('/:id', updateProductController)
+router.delete('/:id', deleteProductController);    //access by parameter
 router.get('' , getProductsByDetailsController)                                 //access by query
 module.exports = router;
