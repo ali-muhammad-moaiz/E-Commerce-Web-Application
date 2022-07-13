@@ -14,11 +14,11 @@ const server = app.listen(process.env.PORT, ()=>{
 });
 
 // unhandled promise rejection (for incorrect database url)
-process.on('unhandledRejection', (err)=>{
-    console.log(`Error: ${err.message}`)
-    console.log("Shutting down the server due to Unhandled Rejection");
+// process.on('unhandledRejection', (err)=>{
+    // console.log(`Error: ${err.message}`)
+    // console.log("Shutting down the server due to Unhandled Rejection");
 
-    server.close(()=>{
-        process.exit(1);
-    });
-});
+    // server.close(()=>{
+        // process.exit(1);
+    // });
+// });

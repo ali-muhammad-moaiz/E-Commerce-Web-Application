@@ -6,7 +6,7 @@ const result2 = "Not found!";
 const getAllProductsController = async (req, res, next)=>{
     const result = await getAllProducts();
     if(!result)
-        return res.status(200).json({'message':result2});
+        return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
 }
 
@@ -15,7 +15,7 @@ const getProductsByDetailsController = async (req, res, next) =>{
 
     const result = await findProduct(id);
     if(!result)
-        return res.status(200).json({'message':result2});
+        return res.status(404).json({'message':result2});
     
     return res.status(200).json({'message':result});
     
@@ -28,8 +28,8 @@ const createNewProductController = async (req, res) =>{
     
     console.log("Product Added Successfully!");
     if(!result)
-        return res.status(200).json({'message':result2});
-    return res.status(200).json({'message':result});
+        return res.status(400).json({'message':result2});
+    return res.status(201).json({'message':result});
 }
 
 const deleteProductController = async (req, res, next) =>{
@@ -37,7 +37,7 @@ const deleteProductController = async (req, res, next) =>{
 
     const result = await deleteProduct(id);
     if(!result)
-        return res.status(200).json({'message':result2});
+        return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
     
 }
@@ -48,7 +48,7 @@ const updateProductController = async (req, res, next) =>{
 
     const result = await updateProduct(id, updates);
     if(!result)
-        return res.status(200).json({'message':result2});
+        return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
 }
 
