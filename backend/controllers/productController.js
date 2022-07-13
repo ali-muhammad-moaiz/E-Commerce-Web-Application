@@ -7,12 +7,13 @@ const getAllProductsController = async (req, res, next)=>{
     const result = await getAllProducts();
     if(!result)
         return res.status(404).json({'message':result2});
+
     return res.status(200).json({'message':result});
 }
 
 const getProductsByDetailsController = async (req, res, next) =>{
     const {id} = req.query;
-
+    
     const result = await findProduct(id);
     if(!result)
         return res.status(404).json({'message':result2});
