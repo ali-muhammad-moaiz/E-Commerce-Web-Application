@@ -7,8 +7,6 @@ const getAllProducts = async ()=>{
 
 const findProduct = async (id)=>{
     const obj = await Product.findById(id);
-    if(!obj)
-        return "Product Not found!";
     return obj;
 }
 
@@ -41,7 +39,6 @@ const updateProduct = async (id, updates)=>{
     if(!updatedObj)
         return "Product Not found!";
     
-    console.log(updatedObj);
     return updatedObj;
 }
 
