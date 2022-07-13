@@ -6,10 +6,12 @@ const getAllProducts = async ()=>{
 }
 
 const findProduct = async (id)=>{
-    const obj = await Product.findById(id);
-    if(!obj)
-        return "Product Not found!";
-    return obj;
+    try{
+        const obj = await Product.findById(id);
+        return obj;
+    }catch(err){
+        return "Product not found!";
+    }
 }
 
 const addNewProduct = async (newProduct) =>{
@@ -25,24 +27,30 @@ const addNewProduct = async (newProduct) =>{
 	    category: newProduct.category
         }
     );
-    const product = await addProduct.save();
-    return product;
+    try{
+        const product = await addProduct.save();
+        return product;
+    }catch(err){
+        return "Please input all the required data.";
+    }
 }
 
 const deleteProduct = async (id)=>{
-    const deletedObj = await Product.findOneAndDelete({ _id: id });
-    if(!deletedObj)
-        return "Product Not found!";
-    return deletedObj;
+    try{
+        const deletedObj = await Product.findOneAndDelete({ _id: id });
+        return deletedObj;
+    }catch(err){
+        return "Product not found!";
+    }
 }
 
 const updateProduct = async (id, updates)=>{
-    const updatedObj = await Product.findOneAndUpdate({ _id: id }, updates, {new:true});
-    if(!updatedObj)
-        return "Product Not found!";
-    
-    console.log(updatedObj);
-    return updatedObj;
+    try{
+        const updatedObj = await Product.findOneAndUpdate({ _id: id }, updates, {new:true});
+        return updatedObj;
+    }catch(err){
+        return "Product not found!";
+    }
 }
 
 module.exports.getAllProducts = getAllProducts;
