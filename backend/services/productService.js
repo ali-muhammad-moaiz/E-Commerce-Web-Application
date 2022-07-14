@@ -12,18 +12,6 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
     }
 }
 
-// const getProductsOfEachCategory = async (queryStr, opt)=>{
-//     const apiFeature = new ApiFeatures(Product.find({}), queryStr).search(opt);
-
-//     try{
-//         const products = apiFeature.query;
-//         return products;
-//     }catch(err){
-//         return "Product not found!";
-//     }
-
-// }
-
 const findProduct = async (id)=>{
     try{
         const obj = await Product.findById(id);
