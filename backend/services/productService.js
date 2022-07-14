@@ -1,8 +1,15 @@
 const Product = require('../models/productModel.js')
+const {ApiFeatures} = require('../utils/apifeatures');
 
-const getAllProducts = async ()=>{
-    const objs = await Product.find({});
-    return objs;
+const getProductsByKeyword = async (queryStr)=>{
+    const apiFeature = new ApiFeatures(Product.find({}), queryStr).search();
+
+    try{
+        const products = apiFeature.query;
+        return products;
+    }catch(err){
+        return "Product not found!";
+    }
 }
 
 const findProduct = async (id)=>{
@@ -53,7 +60,7 @@ const updateProduct = async (id, updates)=>{
     }
 }
 
-module.exports.getAllProducts = getAllProducts;
+module.exports.getProductsByKeyword = getProductsByKeyword;
 module.exports.addNewProduct = addNewProduct;
 module.exports.deleteProduct = deleteProduct;
 module.exports.updateProduct = updateProduct;

@@ -1,17 +1,17 @@
 const express = require('express');
-const {addNewProduct, getAllProducts, findProduct, deleteProduct, updateProduct} = require('../services/productService');
+const {addNewProduct, getProductsByKeyword, findProduct, deleteProduct, updateProduct} = require('../services/productService');
 
 const result2 = "Not found!";
 
-const getAllProductsController = async (req, res, next)=>{
-    const result = await getAllProducts();
+const searchProductController = async (req, res, next)=>{
+    const result = await getProductsByKeyword(req.query);
     if(!result)
         return res.status(404).json({'message':result2});
 
     return res.status(200).json({'message':result});
 }
 
-const getProductsByDetailsController = async (req, res, next) =>{
+const getProductsByIdController = async (req, res, next) =>{
     const {id} = req.query;
     
     const result = await findProduct(id);
@@ -55,8 +55,8 @@ const updateProductController = async (req, res, next) =>{
 
 module.exports.createNewProductController = createNewProductController;
 
-module.exports.getAllProductsController = getAllProductsController;
-module.exports.getProductsByDetailsController = getProductsByDetailsController;
+module.exports.searchProductController = searchProductController;
+module.exports.getProductsByIdController = getProductsByIdController;
 
 module.exports.updateProductController = updateProductController;
 module.exports.deleteProductController = deleteProductController;
