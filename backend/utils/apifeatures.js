@@ -8,7 +8,7 @@ class ApiFeatures{
         const keyword = this.queryStr.keyword ? {           //if keyword is defined
             name: {
                 $regex: this.queryStr.keyword,
-                $options: "i"
+                $options: "i"                               //to make the keyword to be searched as insensitive
             } 
         }:{                                                 //if keyword is not defined
 
