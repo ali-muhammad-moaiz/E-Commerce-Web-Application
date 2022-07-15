@@ -1,17 +1,7 @@
 const express = require('express');
-const {addNewProduct, getProductsByKeywordCategory , findProduct, deleteProduct, updateProduct} = require('../services/productService');
+const {addNewProduct, searchProduct, getProductsByKeywordCategory , findProduct, deleteProduct, updateProduct} = require('../services/productService');
 
 const result2 = "Product Not found!";
-
-const getProductByKeywordCategoryController = async (req, res, next)=>{     
-    const {opt} = req.query;
-    /* opt = 1=>search by keyword | opt=0, search by category */
-
-    const result = await getProductsByKeywordCategory(req.query, opt);
-    if(!result)
-        return res.status(404).json({'message':result2});
-    return res.status(200).json({'message':result});
-}
 
 const getProductByIdController = async (req, res, next) =>{
     const {id} = req.query;
@@ -21,7 +11,6 @@ const getProductByIdController = async (req, res, next) =>{
         return res.status(404).json({'message':result2});
     
     return res.status(200).json({'message':result});
-    
 }
 
 const createNewProductController = async (req, res) =>{
@@ -47,6 +36,16 @@ const deleteProductController = async (req, res, next) =>{
     
 }
 
+const getProductByKeywordController = async (req, res, next) =>{
+    const {key} = req.query;
+
+    const result = await searchProduct(key);
+    if(!result)
+        return res.status(404).json({'message':result2});
+
+    return res.status(200).json({'message':result});
+}
+
 const updateProductController = async (req, res, next) =>{
     const {id} = req.params;
     const {updates} = req.body;
@@ -62,7 +61,7 @@ const updateProductController = async (req, res, next) =>{
 module.exports.createNewProductController = createNewProductController;
 
 module.exports.getProductByIdController = getProductByIdController;
-module.exports.getProductByKeywordCategoryController = getProductByKeywordCategoryController;
+module.exports.getProductByKeywordController = getProductByKeywordController
 
 module.exports.updateProductController = updateProductController;
 module.exports.deleteProductController = deleteProductController;
