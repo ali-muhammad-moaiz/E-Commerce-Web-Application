@@ -13,7 +13,6 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
 }
 
 const searchProduct = async (key)=>{
-    
     const obj1 = await Product.find({name:{'$regex' : key, '$options' : 'i'}});
     const obj2 = await Product.find({'category': key});
     const obj3 = await Product.find({description:{'$regex' : key, '$options' : 'i'}});
