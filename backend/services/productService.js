@@ -16,14 +16,17 @@ const searchProduct = async (key)=>{
     
     const obj1 = await Product.find({name:{'$regex' : key, '$options' : 'i'}});
     const obj2 = await Product.find({'category': key});
-       
-    if(obj1 || obj2){
+    const obj3 = await Product.find({description:{'$regex' : key, '$options' : 'i'}});
+
+    if(obj1 || obj2 || obj3){
         let objRes = [];
         if(obj1)
             objRes.push(obj1);
         if(obj2)
             objRes.push(obj2);
-        
+        if(obj3)
+            objRes.push(obj3);
+
         return objRes;
     }else{
         return "Product not found!";
