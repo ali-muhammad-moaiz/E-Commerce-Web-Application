@@ -1,5 +1,5 @@
 const express = require('express');
-const {addNewProduct, searchProduct, getProductsByKeywordCategory , findProduct, deleteProduct, updateProduct} = require('../services/productService');
+const {addNewProduct, searchProduct, searchProductByPriceRangeKey, findProduct, deleteProduct, updateProduct} = require('../services/productService');
 
 const result2 = "Product Not found!";
 
@@ -46,6 +46,18 @@ const getProductByKeywordController = async (req, res, next) =>{
     return res.status(200).json({'message':result});
 }
 
+const getProductByPriceRangeKeyController = async (req, res, next) =>{
+    const {lt} = req.query;
+    const {gt} = req.query;
+    const {key} = req.query;
+
+    const result = await searchProductByPriceRangeKey(key, gt, lt);
+    if(!result)
+        return res.status(404).json({'message':result2});
+
+    return res.status(200).json({'message':result});
+}
+
 const updateProductController = async (req, res, next) =>{
     const {id} = req.params;
     const {updates} = req.body;
@@ -62,6 +74,7 @@ module.exports.createNewProductController = createNewProductController;
 
 module.exports.getProductByIdController = getProductByIdController;
 module.exports.getProductByKeywordController = getProductByKeywordController
+module.exports.getProductByPriceRangeKeyController = getProductByPriceRangeKeyController;
 
 module.exports.updateProductController = updateProductController;
 module.exports.deleteProductController = deleteProductController;

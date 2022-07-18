@@ -32,6 +32,20 @@ const searchProduct = async (key)=>{
     }
 }
 
+const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan) =>{
+    try{
+        if(key){
+            const obj = await Product.find( { $and: [ {name:{'$regex' : key, '$options' : 'i'}},  {price: {$gt : greaterThan, $lt :  lesserThan}} ] });
+            return obj;
+        }else{
+            const obj = await Product.find({ price : { $gt :  greaterThan, $lt : lesserThan}});
+            return obj;
+        }
+    }catch(err){
+        return "No product found in such range!";
+    }
+}
+
 const findProduct = async (id)=>{
     try{
         const obj = await Product.findById(id);
@@ -84,6 +98,5 @@ module.exports.addNewProduct = addNewProduct;
 module.exports.deleteProduct = deleteProduct;
 module.exports.updateProduct = updateProduct;
 module.exports.findProduct = findProduct;
+module.exports.searchProductByPriceRangeKey = searchProductByPriceRangeKey;
 module.exports.searchProduct = searchProduct;           //for getting the product by key = Name || Category
-
-

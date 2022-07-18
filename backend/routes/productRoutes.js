@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createNewProductController, getProductByIdController, getProductByKeywordController, updateProductController, deleteProductController} = require('../controllers/productController');
+const {createNewProductController, getProductByPriceRangeKeyController, getProductByIdController, getProductByKeywordController, updateProductController, deleteProductController} = require('../controllers/productController');
 
 router.post('/new', createNewProductController);                                 //add product by body
 
@@ -10,4 +10,6 @@ router.delete('/:id', deleteProductController);                                 
 router.get('' , getProductByIdController);                                       //access by query
      
 router.get('/search', getProductByKeywordController);
+router.get('/search/price', getProductByPriceRangeKeyController);
+
 module.exports = router;
