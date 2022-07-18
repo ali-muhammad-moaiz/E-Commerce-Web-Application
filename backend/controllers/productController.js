@@ -38,8 +38,9 @@ const deleteProductController = async (req, res, next) =>{
 
 const getProductByKeywordController = async (req, res, next) =>{
     const {key} = req.query;
+    const page = Number(req.query.page);
 
-    const result = await searchProduct(key);
+    const result = await searchProduct(key, page);
     if(!result)
         return res.status(404).json({'message':result2});
 
@@ -50,8 +51,9 @@ const getProductByPriceRangeKeyController = async (req, res, next) =>{
     const {lt} = req.query;
     const {gt} = req.query;
     const {key} = req.query;
+    const page = Number(req.query.page);
 
-    const result = await searchProductByPriceRangeKey(key, gt, lt);
+    const result = await searchProductByPriceRangeKey(key, gt, lt, page);
     if(!result)
         return res.status(404).json({'message':result2});
 

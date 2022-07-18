@@ -1,5 +1,6 @@
 const Product = require('../models/productModel.js')
 const {ApiFeatures} = require('../utils/apifeatures');
+const RESULTSPERPAGE = 5;
 
 const getProductsByKeywordCategory = async (queryStr, opt)=>{
     const apiFeature = new ApiFeatures(Product.find({}), queryStr).search(opt);
@@ -12,10 +13,13 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
     }
 }
 
-const searchProduct = async (key)=>{
-    const obj1 = await Product.find({name:{'$regex' : key, '$options' : 'i'}});
-    const obj2 = await Product.find({'category': key});
-    const obj3 = await Product.find({description:{'$regex' : key, '$options' : 'i'}});
+const searchProduct = async (key, page)=>{
+    const currentPage = page || 1;
+    const skip = RESULTSPERPAGE * (currentPage - 1); 
+
+    const obj1 = await Product.find({name:{'$regex' : key, '$options' : 'i'}}).limit(RESULTSPERPAGE).skip(skip);;
+    const obj2 = await Product.find({'category': key}).limit(RESULTSPERPAGE).skip(skip);;
+    const obj3 = await Product.find({description:{'$regex' : key, '$options' : 'i'}}).limit(RESULTSPERPAGE).skip(skip);; 
 
     if(obj1 || obj2 || obj3){
         let objRes = [];
@@ -32,13 +36,16 @@ const searchProduct = async (key)=>{
     }
 }
 
-const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan) =>{
+const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan, page) =>{
+    const currentPage = page || 1;
     try{
+        const skip = RESULTSPERPAGE * (currentPage - 1);   
+
         if(key){
-            const obj = await Product.find( { $and: [ {name:{'$regex' : key, '$options' : 'i'}},  {price: {$gt : greaterThan, $lt :  lesserThan}} ] });
+            const obj = await Product.find( { $and: [ {name:{'$regex' : key, '$options' : 'i'}},  {price: {$gt : greaterThan, $lt :  lesserThan}} ] }).limit(RESULTSPERPAGE).skip(skip);
             return obj;
         }else{
-            const obj = await Product.find({ price : { $gt :  greaterThan, $lt : lesserThan}});
+            const obj = await Product.find({ price : { $gt :  greaterThan, $lt : lesserThan}}).limit(RESULTSPERPAGE).skip(skip);;
             return obj;
         }
     }catch(err){
