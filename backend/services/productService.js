@@ -16,23 +16,12 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
 const searchProduct = async (key, page)=>{
     const currentPage = page || 1;
     const skip = RESULTSPERPAGE * (currentPage - 1); 
-
-    const obj1 = await Product.find({name:{'$regex' : key, '$options' : 'i'}}).limit(RESULTSPERPAGE).skip(skip);;
-    const obj2 = await Product.find({'category': key}).limit(RESULTSPERPAGE).skip(skip);;
-    const obj3 = await Product.find({description:{'$regex' : key, '$options' : 'i'}}).limit(RESULTSPERPAGE).skip(skip);; 
-
-    if(obj1 || obj2 || obj3){
-        let objRes = [];
-        if(obj1)
-            objRes.push(obj1);
-        if(obj2)
-            objRes.push(obj2);
-        if(obj3)
-            objRes.push(obj3);
-
+    
+    try{
+        const objRes = await Product.find( { $or: [ {name:{'$regex' : key, '$options' : 'i'}},  {category: key}, {description:{'$regex' : key, '$options' : 'i'}} ] }).limit(RESULTSPERPAGE).skip(skip);
         return objRes;
-    }else{
-        return "Product not found!";
+    }catch(err){
+        return "No such product found!";
     }
 }
 
