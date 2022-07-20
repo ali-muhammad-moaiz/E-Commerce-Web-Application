@@ -1,6 +1,4 @@
-const express = require('express');
 const {addNewProduct, searchProduct, searchProductByPriceRangeKey, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-
 const result2 = "Product Not found!";
 
 const getProductByIdController = async (req, res, next) =>{
@@ -32,8 +30,7 @@ const deleteProductController = async (req, res, next) =>{
         return res.status(404).json({'message':result2});
 
     console.log("Product deleted from database.");
-    return res.status(200).json({'message':result});
-    
+    return res.status(200).json({'message':result}); 
 }
 
 const getProductByKeywordController = async (req, res, next) =>{
