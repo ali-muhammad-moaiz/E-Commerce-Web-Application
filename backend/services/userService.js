@@ -1,7 +1,8 @@
 const User = require('../models/userModel.js');
+const bcrypt = require('bcryptjs');
 
 const addNewUser = async (newUser) => {
-    const adduser = new User(
+    const addUser = new User(
         {
             name: newUser.name,
             email: newUser.email,
@@ -12,9 +13,16 @@ const addNewUser = async (newUser) => {
             }
         }
     );
+
+    const token = addUser.getJWTToken();
+
     try{
-        const user = await adduser.save();
-        return user;
+        const user = await addUser.save();
+        result = [];
+        
+        result.push(user);
+        result.push(token);
+        return result;
     }catch(err){
         return "Please input all the required data.";
     }
@@ -58,6 +66,19 @@ const getAllUser = async ()=>{
     }
 }
 
+const validateCredentials = async (email, password) => {
+    const validEmail = await User.findOne({email}).select("+password");
+
+    if(validEmail){
+        const check = bcrypt.compareSync(password, validEmail.password);
+        if(check){
+            const token = validEmail.getJWTToken();
+            return token;
+        }
+    }   
+}
+
+module.exports.validateCredentials = validateCredentials;
 module.exports.addNewUser = addNewUser;
 module.exports.deleteUser = deleteUser;
 module.exports.getAllUser = getAllUser;
