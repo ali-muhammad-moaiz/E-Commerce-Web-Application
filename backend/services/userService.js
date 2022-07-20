@@ -71,11 +71,9 @@ const validateCredentials = async (email, password) => {
 
     if(validEmail){
         const check = bcrypt.compareSync(password, validEmail.password);
-        if(check){
-            const token = validEmail.getJWTToken();
-            return token;
-        }
-    }   
+        if(check)
+            return validEmail.getJWTToken();
+    }  
 }
 
 module.exports.validateCredentials = validateCredentials;
