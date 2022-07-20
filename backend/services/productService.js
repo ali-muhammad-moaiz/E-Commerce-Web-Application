@@ -1,4 +1,4 @@
-const Product = require('../models/productModel.js')
+const Product = require('../models/productModel.js');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;
 
@@ -16,6 +16,7 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
 const searchProduct = async (key, page)=>{
     const currentPage = page || 1;
     const skip = RESULTSPERPAGE * (currentPage - 1); 
+    const productCount = await Product.countDocuments();
     
     try{
         const objRes = await Product.find( { $or: [ {name:{'$regex' : key, '$options' : 'i'}},  {category: key}, {description:{'$regex' : key, '$options' : 'i'}} ] }).limit(RESULTSPERPAGE).skip(skip);
@@ -27,6 +28,8 @@ const searchProduct = async (key, page)=>{
 
 const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan, page) =>{
     const currentPage = page || 1;
+    const productCount = await Product.countDocuments();
+
     try{
         const skip = RESULTSPERPAGE * (currentPage - 1);   
 
