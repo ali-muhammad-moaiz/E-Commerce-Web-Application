@@ -1,18 +1,17 @@
-const {addNewUser, deleteUser, getAllUser, updateUserPass, updateUserDetail} = require('../services/userService');
+const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserDetail} = require('../services/userService');
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
-    console.log(user.password);
     user.password = await bcrypt.hash(user.password, 12);
-    console.log(user.password);
     const result = await addNewUser(user);
     
-    console.log("User added in database.");
     if(!result)
         return res.status(400).json({'message':result2});
-    return res.status(201).json({'message':result});
+    
+    const token = result[1];
+    return res.status(201).json({success: true, token});
 }
 
 const deleteUserController = async (req, res, next) =>{
@@ -61,7 +60,22 @@ const getAllUserController = async (req, res, next) =>{
     return res.status(200).json({'message':result}); 
 }
 
+const loginUserController = async(req, res, next) => {
+    const {email, password} = req.body;
+
+    if(!email || !password)
+        return res.status(401).json({'message':"Please enter email and password both!"});
+    
+    const valid = await validateCredentials(email, password);
+
+    if(!valid)
+        return res.status(401).json({'message':"Please Enter valid Credentials!"});
+
+    return res.status(200).json({success: true, 'message': "Succesfully loggedin"}); 
+}
+
 module.exports.registerUserController = registerUserController;
+module.exports.loginUserController = loginUserController;
 module.exports.deleteUserController = deleteUserController;
 module.exports.updateUserPassController = updateUserPassController;
 module.exports.updateUserDetailController = updateUserDetailController;
