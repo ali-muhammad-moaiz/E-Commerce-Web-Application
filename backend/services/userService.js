@@ -14,15 +14,13 @@ const addNewUser = async (newUser) => {
         }
     );
 
-    const token = addUser.getJWTToken();
-
     try{
         const user = await addUser.save();
-        result = [];
+        if(user){
+            const result = user;
+            return result;
+        }
         
-        result.push(user);
-        result.push(token);
-        return result;
     }catch(err){
         return "Please input all the required data.";
     }
@@ -68,12 +66,11 @@ const getAllUser = async ()=>{
 
 const validateCredentials = async (email, password) => {
     const validEmail = await User.findOne({email}).select("+password");
-
     if(validEmail){
         const check = bcrypt.compareSync(password, validEmail.password);
         if(check)
-            return validEmail.getJWTToken();
-    }  
+            return validEmail;
+    } 
 }
 
 module.exports.validateCredentials = validateCredentials;
