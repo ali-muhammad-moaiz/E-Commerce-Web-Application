@@ -1,17 +1,21 @@
 const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserDetail} = require('../services/userService');
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
+const {getToken} = require('../utils/jwttoken');
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
     user.password = await bcrypt.hash(user.password, 12);
     const result = await addNewUser(user);
     
-    if(!result)
-        return res.status(400).json({'message':result2});
+    if(!result || !result.email)
+        return res.status(400).json({'message':"Unable to add the user!"});
     
-    const token = result[1];
-    return res.status(201).json({success: true, token});
+    const token_options = await getToken(result);     //result is payload for token
+    const token = token_options[0];
+    const options = token_options[1];
+
+    return res.status(201).cookie('token', token, options).json({success: true, result, token}); 
 }
 
 const deleteUserController = async (req, res, next) =>{
@@ -71,7 +75,8 @@ const loginUserController = async(req, res, next) => {
     if(!valid)
         return res.status(401).json({'message':"Please Enter valid Credentials!"});
 
-    return res.status(200).json({success: true, 'message': "Succesfully loggedin"}); 
+    const token = getToken(valid, 200, res);
+    return res.status(201).json({success: true, valid, token}); 
 }
 
 module.exports.registerUserController = registerUserController;
