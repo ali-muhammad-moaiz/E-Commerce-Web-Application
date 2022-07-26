@@ -9,9 +9,9 @@ const isAuthenticUser = async (req, res, next) =>{
 
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     const User = await user.findById(decodedData.id);
-    console.log(User);
+
+    req.user = User;
     next();
-    
 }
 
 module.exports.isAuthenticUser = isAuthenticUser;
