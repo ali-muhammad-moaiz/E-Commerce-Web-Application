@@ -8,7 +8,7 @@ const sendToken = async (userPayload) => {
         const token = await userPayload.getJWTToken();
 
         const options = {
-            expires: new Date(
+            expiress: new Date(
                 Date.now() + process.env.COOKIE_EXPIRE * 60 * 60 * 1000     //to convert days into milliseconds
             ),
             httpOnly: true
