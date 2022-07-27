@@ -37,10 +37,10 @@ const deleteUser = async (id)=>{
 }
 
 const updateUserPass = async (userTmp, newPass)=>{
-    const updates = { $set: {password: newPass} };
     const id = userTmp._id;
-    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, {new:true}).select("+password");
-    console.log(updatedObj);
+    const updates = {password: newPass};
+    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, )
+    
     if(updatedObj){
         return updatedObj;
     }

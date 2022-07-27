@@ -89,13 +89,12 @@ const forgetPassword = async (req, res) =>{
     const {password} = req.body;
 
     if(modifyUser){
-        const userWithResetToken = modifyUser.getPasswordResetToken();
-        const updatedUser = updateUserWithToken(userWithResetToken);
+        await modifyUser.getPasswordResetToken();
+        const updatedUser = await updateUserWithToken(modifyUser);
 
         if(updatedUser){
             hashedPass = await bcrypt.hash(password, 12);
             const result = await updateUserPass(updatedUser, hashedPass);
-            console.log(result);
             if(result){
                 return res.status(201).json({success: true, result}); 
             }
