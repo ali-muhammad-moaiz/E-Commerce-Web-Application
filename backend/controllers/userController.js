@@ -2,6 +2,7 @@ const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, 
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
+const { findById } = require('../models/userModel');
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -51,7 +52,11 @@ const updateUserDetailController = async (req, res, next) =>{
     if(!result)
         return res.status(404).json({'message':result2});
 
-    return res.status(200).json({'message':result}); 
+    const token_options = await getToken(result);     //valid is payload for token
+    const token = token_options[0];
+    const options = token_options[1];
+    
+    return res.status(201).cookie('token', token, options).json({success: true, result, token});
 }
 
 const getAllUserController = async (req, res, next) =>{
@@ -75,12 +80,25 @@ const loginUserController = async(req, res, next) => {
     if(!valid)
         return res.status(401).json({'message':"Please Enter valid Credentials!"});
 
-    const token = getToken(valid, 200, res);
-    return res.status(201).json({success: true, valid, token}); 
+    const token_options = await getToken(valid);     //valid is payload for token
+    const token = token_options[0];
+    const options = token_options[1];
+
+    return res.status(201).cookie('token', token, options).json({success: true, valid, token});
+}
+
+const logoutUserController = async(req, res) => {
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true
+    });
+
+    return res.status(200).json({success: true, message: "Logged out successfully."});
 }
 
 module.exports.registerUserController = registerUserController;
 module.exports.loginUserController = loginUserController;
+module.exports.logoutUserController = logoutUserController;
 module.exports.deleteUserController = deleteUserController;
 module.exports.updateUserPassController = updateUserPassController;
 module.exports.updateUserDetailController = updateUserDetailController;

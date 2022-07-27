@@ -10,7 +10,8 @@ const addNewUser = async (newUser) => {
             avatar:{
                 public_id: "SampleID",
                 url: "profilePictureUrl"
-            }
+            },
+            role: newUser.role
         }
     );
 

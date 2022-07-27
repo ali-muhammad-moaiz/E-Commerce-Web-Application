@@ -5,12 +5,13 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please enter Product Name: "],
         maxLength : 40,
-        trim: true
+        trim: true,
     },
     description: {
         type: String,
         maxLength : 80,
-        required: [true, "Please enter Product Description: "]
+        required: [true, "Please enter Product Description: "],
+        unique: true
     }, 
     price: {
         type: Number,

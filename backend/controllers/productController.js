@@ -15,10 +15,10 @@ const createNewProductController = async (req, res) =>{
     const {product} = req.body;
 
     const result = await addNewProduct(product);
-    
-    console.log("Product added in database.");
+
     if(!result)
         return res.status(400).json({'message':result2});
+    console.log("Product added in database.");
     return res.status(201).json({'message':result});
 }
 
