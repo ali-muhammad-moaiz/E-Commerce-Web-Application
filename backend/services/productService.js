@@ -57,14 +57,15 @@ const findProduct = async (id)=>{
 const addNewProduct = async (newProduct) =>{
     const addProduct = new Product(
         {
-        name: newProduct.name,
-	    description: newProduct.description,
-	    price: newProduct.price,
-	    images:{
-	        product_id: newProduct.images.product_id,
-	        url: newProduct.images.url
-	    },
-	    category: newProduct.category
+            name: newProduct.name,
+            description: newProduct.description,
+            price: newProduct.price,
+            images:{
+                product_id: newProduct.images.product_id,
+                url: newProduct.images.url
+            },
+            category: newProduct.category,
+            stock: newProduct.stock
         }
     );
     try{
