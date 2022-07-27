@@ -1,8 +1,8 @@
-const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserDetail} = require('../services/userService');
+const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
-const { findById } = require('../models/userModel');
+const { findById, findOneAndUpdate } = require('../models/userModel');
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -27,19 +27,6 @@ const deleteUserController = async (req, res, next) =>{
         return res.status(404).json({'message':result2});
 
     console.log("Product deleted from database.");
-    return res.status(200).json({'message':result}); 
-}
-
-const updateUserPassController = async (req, res, next) =>{
-    const {password} = req.body;
-    const {id} = req.params;
-
-    hashedPass = await bcrypt.hash(password, 12);
-    const result = await updateUserPass(id, hashedPass);
-
-    if(!result)
-        return res.status(404).json({'message':result2});
-
     return res.status(200).json({'message':result}); 
 }
 
@@ -96,10 +83,33 @@ const logoutUserController = async(req, res) => {
     return res.status(200).json({success: true, message: "Logged out successfully."});
 }
 
+//left with node-mailer implementation:
+const forgetPassword = async (req, res) =>{
+    const modifyUser = await findUserByEmail(req.body.email);
+    const {password} = req.body;
+
+    if(modifyUser){
+        const userWithResetToken = modifyUser.getPasswordResetToken();
+        const updatedUser = updateUserWithToken(userWithResetToken);
+
+        if(updatedUser){
+            hashedPass = await bcrypt.hash(password, 12);
+            const result = await updateUserPass(updatedUser, hashedPass);
+            console.log(result);
+            if(result){
+                return res.status(201).json({success: true, result}); 
+            }
+            return res.status(500).json({'message':result2});
+        }
+        return res.status(500).json({'message':result2});
+    }
+    return res.status(404).json({'message':result2});
+}
+
 module.exports.registerUserController = registerUserController;
 module.exports.loginUserController = loginUserController;
 module.exports.logoutUserController = logoutUserController;
 module.exports.deleteUserController = deleteUserController;
-module.exports.updateUserPassController = updateUserPassController;
 module.exports.updateUserDetailController = updateUserDetailController;
 module.exports.getAllUserController = getAllUserController;
+module.exports.forgetPassword = forgetPassword;

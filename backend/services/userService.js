@@ -36,13 +36,13 @@ const deleteUser = async (id)=>{
     }
 }
 
-const updateUserPass = async (id, newPass)=>{
-    try{
-        const updates = { $set: {password: newPass} };
-        const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, {new:true});
+const updateUserPass = async (userTmp, newPass)=>{
+    const updates = { $set: {password: newPass} };
+    const id = userTmp._id;
+    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, {new:true}).select("+password");
+    console.log(updatedObj);
+    if(updatedObj){
         return updatedObj;
-    }catch(err){
-        return "User not found!";
     }
 }
 
@@ -53,6 +53,13 @@ const updateUserDetail = async (id, updatedName, updatedEmail)=>{
         return updatedObj;
     }catch(err){
         return "User not found!";
+    }
+}
+
+const updateUserWithToken = async (objTemp) =>{
+    const updatedObj = await User.findOneAndUpdate({ _id: objTemp._id}, objTemp, {new:true}).select("+password");
+    if(updatedObj){
+        return updatedObj;
     }
 }
 
@@ -74,9 +81,18 @@ const validateCredentials = async (email, password) => {
     } 
 }
 
+const findUserByEmail = async (email) => {
+    const validUser = await User.findOne({email});
+    if(validUser){
+        return validUser;
+    }
+}
+
 module.exports.validateCredentials = validateCredentials;
 module.exports.addNewUser = addNewUser;
 module.exports.deleteUser = deleteUser;
 module.exports.getAllUser = getAllUser;
 module.exports.updateUserPass = updateUserPass;
 module.exports.updateUserDetail = updateUserDetail;
+module.exports.findUserByEmail = findUserByEmail;
+module.exports.updateUserWithToken = updateUserWithToken;
