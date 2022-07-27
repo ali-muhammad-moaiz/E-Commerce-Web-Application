@@ -14,7 +14,7 @@ const getProductByIdController = async (req, res, next) =>{
 const createNewProductController = async (req, res) =>{
     const {product} = req.body;
 
-    const result = await addNewProduct(product);
+    const result = await addNewProduct(product, req.user._id);
 
     if(!result)
         return res.status(400).json({'message':result2});

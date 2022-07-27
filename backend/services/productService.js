@@ -54,7 +54,7 @@ const findProduct = async (id)=>{
     }
 }
 
-const addNewProduct = async (newProduct) =>{
+const addNewProduct = async (newProduct, adderId) =>{
     const addProduct = new Product(
         {
             name: newProduct.name,
@@ -65,7 +65,8 @@ const addNewProduct = async (newProduct) =>{
                 url: newProduct.images.url
             },
             category: newProduct.category,
-            stock: newProduct.stock
+            stock: newProduct.stock,
+            adminId: adderId
         }
     );
     try{
