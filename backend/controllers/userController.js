@@ -2,7 +2,8 @@ const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, 
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
-const { findById, findOneAndUpdate } = require('../models/userModel');
+const {sendEmail} = require('../utils/sendEmail');
+
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -87,7 +88,9 @@ const logoutUserController = async(req, res) => {
 const forgetPassword = async (req, res) =>{
     const modifyUser = await findUserByEmail(req.body.email);
     const {password} = req.body;
-
+    
+    sendEmail();
+    
     if(modifyUser){
         await modifyUser.getPasswordResetToken();
         const updatedUser = await updateUserWithToken(modifyUser);
