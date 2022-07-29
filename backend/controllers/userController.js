@@ -83,7 +83,6 @@ const logoutUserController = async(req, res) => {
     return res.status(200).json({success: true, message: "Logged out successfully."});
 }
 
-//left with node-mailer implementation:
 const forgetPassword = async (req, res) =>{
     const modifyUser = await findUserByEmail(req.body.email);
     
