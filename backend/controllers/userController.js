@@ -1,9 +1,8 @@
-const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
+const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, changePassword, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
 const {sendEmail} = require('../utils/sendEmail');
-
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -87,25 +86,33 @@ const logoutUserController = async(req, res) => {
 //left with node-mailer implementation:
 const forgetPassword = async (req, res) =>{
     const modifyUser = await findUserByEmail(req.body.email);
-    const {password} = req.body;
-    
-    sendEmail();
     
     if(modifyUser){
         await modifyUser.getPasswordResetToken();
         const updatedUser = await updateUserWithToken(modifyUser);
 
-        if(updatedUser){
-            hashedPass = await bcrypt.hash(password, 12);
-            const result = await updateUserPass(updatedUser, hashedPass);
-            if(result){
-                return res.status(201).json({success: true, result}); 
-            }
+        if(!updatedUser){
             return res.status(500).json({'message':result2});
         }
-        return res.status(500).json({'message':result2});
+            
+        let url = `${req.protocol}://${req.get("host")}/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
+        //`http://localhost:PORT#/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
+
+        sendEmail(url);
+        return res.status(200).json({'message':"Mail sent!"});           
     }
     return res.status(404).json({'message':result2});
+}
+
+const changePasswordController = async (req, res) =>{
+    const password = req.body.password;
+    const hashedPass = await bcrypt.hash(password, 12);
+    const result = await changePassword(req.params.token, hashedPass);
+    if(!result){
+        return res.status(500).json({'message':"Something went wrong!"});
+    }
+    return res.status(200).json({success: true, result}); 
+
 }
 
 module.exports.registerUserController = registerUserController;
@@ -115,3 +122,4 @@ module.exports.deleteUserController = deleteUserController;
 module.exports.updateUserDetailController = updateUserDetailController;
 module.exports.getAllUserController = getAllUserController;
 module.exports.forgetPassword = forgetPassword;
+module.exports.changePasswordController = changePasswordController;

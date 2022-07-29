@@ -39,8 +39,16 @@ const deleteUser = async (id)=>{
 const updateUserPass = async (userTmp, newPass)=>{
     const id = userTmp._id;
     const updates = {password: newPass};
-    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, )
-    
+    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, );
+    console.log(updatedObj)
+    if(updatedObj){
+        return updatedObj;
+    }
+}
+
+const changePassword = async (validToken, newPass) =>{
+    const updates = {password: newPass};
+    const updatedObj = await User.findOneAndUpdate( {resetPasswordToken: validToken}, updates );
     if(updatedObj){
         return updatedObj;
     }
@@ -96,3 +104,4 @@ module.exports.updateUserPass = updateUserPass;
 module.exports.updateUserDetail = updateUserDetail;
 module.exports.findUserByEmail = findUserByEmail;
 module.exports.updateUserWithToken = updateUserWithToken;
+module.exports.changePassword = changePassword;

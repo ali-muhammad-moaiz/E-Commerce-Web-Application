@@ -1,6 +1,6 @@
 var nodemailer = require('nodemailer');
 
-function sendEmail(){
+function sendEmail(urlChangePass){
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         
@@ -14,9 +14,9 @@ function sendEmail(){
         from: 'alimuhammed02111@gmail.com',
         to: 'alimuhammad.moaiz@gmail.com',
         subject: 'E-STORE: USER ACCOUNT PASSWORD RECOVERY',
-        text: 'That was easy!'
+        text: "Click the link below to change your account's password:\n\n"+urlChangePass+"\n\nThe link will work for 15 minutes only.\n\n\n\nIf you have not requested for this email, kindly ignore it!"
     };
-      
+    
     const sendEmail = transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           console.log(error);
