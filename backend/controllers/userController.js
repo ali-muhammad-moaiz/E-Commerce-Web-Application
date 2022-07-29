@@ -1,8 +1,8 @@
-const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, updateUserDetail} = require('../services/userService');
+const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, changePassword, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
 const result2 = "No such user exists!";
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
-const { findById } = require('../models/userModel');
+const {sendEmail} = require('../utils/sendEmail');
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -27,19 +27,6 @@ const deleteUserController = async (req, res, next) =>{
         return res.status(404).json({'message':result2});
 
     console.log("Product deleted from database.");
-    return res.status(200).json({'message':result}); 
-}
-
-const updateUserPassController = async (req, res, next) =>{
-    const {password} = req.body;
-    const {id} = req.params;
-
-    hashedPass = await bcrypt.hash(password, 12);
-    const result = await updateUserPass(id, hashedPass);
-
-    if(!result)
-        return res.status(404).json({'message':result2});
-
     return res.status(200).json({'message':result}); 
 }
 
@@ -96,10 +83,43 @@ const logoutUserController = async(req, res) => {
     return res.status(200).json({success: true, message: "Logged out successfully."});
 }
 
+//left with node-mailer implementation:
+const forgetPassword = async (req, res) =>{
+    const modifyUser = await findUserByEmail(req.body.email);
+    
+    if(modifyUser){
+        await modifyUser.getPasswordResetToken();
+        const updatedUser = await updateUserWithToken(modifyUser);
+
+        if(!updatedUser){
+            return res.status(500).json({'message':result2});
+        }
+            
+        let url = `${req.protocol}://${req.get("host")}/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
+        //`http://localhost:PORT#/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
+
+        sendEmail(url);
+        return res.status(200).json({'message':"Mail sent!"});           
+    }
+    return res.status(404).json({'message':result2});
+}
+
+const changePasswordController = async (req, res) =>{
+    const password = req.body.password;
+    const hashedPass = await bcrypt.hash(password, 12);
+    const result = await changePassword(req.params.token, hashedPass);
+    if(!result){
+        return res.status(500).json({'message':"Something went wrong!"});
+    }
+    return res.status(200).json({success: true, result}); 
+
+}
+
 module.exports.registerUserController = registerUserController;
 module.exports.loginUserController = loginUserController;
 module.exports.logoutUserController = logoutUserController;
 module.exports.deleteUserController = deleteUserController;
-module.exports.updateUserPassController = updateUserPassController;
 module.exports.updateUserDetailController = updateUserDetailController;
 module.exports.getAllUserController = getAllUserController;
+module.exports.forgetPassword = forgetPassword;
+module.exports.changePasswordController = changePasswordController;

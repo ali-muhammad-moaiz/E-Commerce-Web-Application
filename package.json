@@ -21,7 +21,6 @@
     "nodemon": "^2.0.19",
     "validator": "^13.7.0"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alimuhammadmz/MERN-Ecommerce-Website.git"
