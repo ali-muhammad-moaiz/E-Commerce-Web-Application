@@ -48,9 +48,15 @@ const updateUserPass = async (userTmp, newPass)=>{
 
 const changePassword = async (validToken, newPass) =>{
     const updates = {password: newPass};
-    const updatedObj = await User.findOneAndUpdate( {resetPasswordToken: validToken}, updates );
-    if(updatedObj){
-        return updatedObj;
+    const toBeUpdated = await User.findOne( {resetPasswordToken: validToken});
+    if(toBeUpdated){
+        if(toBeUpdated.resetPasswordExpire < Date.now()){
+            return;
+        }
+        const updatedObj = await User.findOneAndUpdate( {resetPasswordToken: validToken}, updates );
+        if(updatedObj){
+            return updatedObj;
+        }
     }
 }
 

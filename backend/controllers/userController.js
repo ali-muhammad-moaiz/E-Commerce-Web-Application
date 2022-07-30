@@ -97,7 +97,7 @@ const forgetPassword = async (req, res) =>{
         let url = `${req.protocol}://${req.get("host")}/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
         //`http://localhost:PORT#/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
 
-        sendEmail(url);
+        sendEmail(url, modifyUser.email);
         return res.status(200).json({'message':"Mail sent!"});           
     }
     return res.status(404).json({'message':result2});
@@ -105,13 +105,19 @@ const forgetPassword = async (req, res) =>{
 
 const changePasswordController = async (req, res) =>{
     const password = req.body.password;
+    if(password != req.body.confirmPassword){
+        return res.status(422).json({'message': "Passwords are not same!"});
+    }
     const hashedPass = await bcrypt.hash(password, 12);
     const result = await changePassword(req.params.token, hashedPass);
     if(!result){
         return res.status(500).json({'message':"Something went wrong!"});
     }
-    return res.status(200).json({success: true, result}); 
+    result.resetPasswordExpire = undefined;
+    result.resetPasswordToken = undefined;
+    result.save();
 
+    return res.status(200).json({success: true, result}); 
 }
 
 module.exports.registerUserController = registerUserController;
