@@ -39,7 +39,7 @@ const deleteUser = async (id)=>{
 const updateRole = async (id, role) =>{
     const updates = {"role":role};
 
-    const updatedObj = await User.findOneAndUpdate( {_id: id}, updates );
+    const updatedObj = await User.findOneAndUpdate( {id: id}, updates );
     if(updatedObj){
         return updatedObj;
     }
