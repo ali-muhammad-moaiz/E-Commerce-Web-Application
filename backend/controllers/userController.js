@@ -1,8 +1,8 @@
-const {addNewUser, validateCredentials, deleteUser, getAllUser, updateUserPass, changePassword, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
-const result2 = "No such user exists!";
+const {addNewUser, validateCredentials, deleteUser, getAllUser, updateRole, findUserById, updateUserPass, changePassword, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
 const {sendEmail} = require('../utils/sendEmail');
+const result2 = "No such user exists!";
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
@@ -19,25 +19,60 @@ const registerUserController = async (req, res) =>{
     return res.status(201).cookie('token', token, options).json({success: true, result, token}); 
 }
 
-const deleteUserController = async (req, res, next) =>{
+const deleteUserController = async (req, res) =>{     //by admin
     const {id} = req.params;
 
     const result = await deleteUser(id);
     if(!result)
         return res.status(404).json({'message':result2});
 
-    console.log("Product deleted from database.");
     return res.status(200).json({'message':result}); 
 }
 
-const updateUserDetailController = async (req, res, next) =>{
-    const {name, email} = req.body;
-    const {id} = req.params;
+const updateUserRoleController = (req, res) =>{
+    const {role} = req.body;
+    const id = req.params.id;
 
-    const result = await updateUserDetail(id, name, email);
+    const result = updateRole(id, role);
+    if(!result){
+        return res.status(404).json({'message':result2});
+    }
+    return res.status(200).json({'message':result}); 
+}
+
+const deleteProfileController = async (req, res) => {       //by the user himself
+    if(req.user){
+        const id = req.user.id;
+        const result = await deleteUser(id);
+        if(!result)
+            return res.status(404).json({'message':result2});
+
+        res.clearCookie('token');
+        console.log("User deleted from database.");
+        return res.status(200).json({'message':result}); 
+    }
+    return res.status(404).json({'message': "Something went wrong!"});
+}
+
+const getPersonalDetailsController = async(req, res) => {
+    const id = req.user._id;
+    const result = await findUserById(id);
 
     if(!result)
         return res.status(404).json({'message':result2});
+
+    return res.status(200).json({success: true, result});
+}
+
+const updateUserProfileController = async (req, res) =>{
+    const {name, email} = req.body;
+    const id = req.user.id;
+
+    const result = await updateUserDetail(id, name, email);
+
+    if(!result){
+        return res.status(401).json({'message':"Something went wrong!"});
+    }
 
     const token_options = await getToken(result);     //valid is payload for token
     const token = token_options[0];
@@ -46,12 +81,32 @@ const updateUserDetailController = async (req, res, next) =>{
     return res.status(201).cookie('token', token, options).json({success: true, result, token});
 }
 
-const getAllUserController = async (req, res, next) =>{
-    const {id} = req.params;
+const updateUserPasswordController = async (req, res) =>{
+    const {oldPassword, newPassword, confirmPassword} = req.body;
 
-    const result = await getAllUser(id);
+    if(newPassword == confirmPassword){
+        const hashedPass = await bcrypt.hash(newPassword, 12);
+
+        const result = await updateUserPass(req.user.id, oldPassword, hashedPass);
+        if(!result ){
+            return res.status(404).json({'message':result2});
+        }else if( result &&  !result.email){
+            return res.status(401).json({'message':result});
+        }
+        
+        const token_options = await getToken(result);     //result is payload for token
+        const token = token_options[0];
+        const options = token_options[1];
+        
+        return res.status(201).cookie('token', token, options).json({success: true, result, token});
+    }
+    return res.status(401).json({'message': "Both passwords are not same!"});
+}
+
+const getAllUserController = async (req, res) =>{
+    const result = await getAllUser();
     if(!result)
-        return res.status(404).json({'message':result2});
+        return res.status(404).json({'message':"No users exists!"});
 
     return res.status(200).json({'message':result}); 
 }
@@ -67,7 +122,7 @@ const loginUserController = async(req, res, next) => {
     if(!valid)
         return res.status(401).json({'message':"Please Enter valid Credentials!"});
 
-    const token_options = await getToken(valid);     //valid is payload for token
+    const token_options = await getToken(valid);
     const token = token_options[0];
     const options = token_options[1];
 
@@ -117,14 +172,22 @@ const changePasswordController = async (req, res) =>{
     result.resetPasswordToken = undefined;
     result.save();
 
-    return res.status(200).json({success: true, result}); 
+    const token_options = await getToken(result);     //valid is payload for token
+    const token = token_options[0];
+    const options = token_options[1];
+
+    return res.status(200).cookie('token', token, options).json({success: true, result, token});
 }
 
 module.exports.registerUserController = registerUserController;
 module.exports.loginUserController = loginUserController;
 module.exports.logoutUserController = logoutUserController;
 module.exports.deleteUserController = deleteUserController;
-module.exports.updateUserDetailController = updateUserDetailController;
+module.exports.updateUserProfileController = updateUserProfileController;
 module.exports.getAllUserController = getAllUserController;
 module.exports.forgetPassword = forgetPassword;
 module.exports.changePasswordController = changePasswordController;
+module.exports.getPersonalDetailsController = getPersonalDetailsController;
+module.exports.updateUserPasswordController = updateUserPasswordController;
+module.exports.deleteProfileController = deleteProfileController;
+module.exports.updateUserRoleController = updateUserRoleController;
