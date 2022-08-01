@@ -36,13 +36,28 @@ const deleteUser = async (id)=>{
     }
 }
 
-const updateUserPass = async (userTmp, newPass)=>{
-    const id = userTmp._id;
-    const updates = {password: newPass};
-    const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, );
-    console.log(updatedObj)
+const updateRole = async (id, role) =>{
+    const updates = {"role":role};
+
+    const updatedObj = await User.findOneAndUpdate( {_id: id}, updates );
     if(updatedObj){
         return updatedObj;
+    }
+}
+
+const updateUserPass = async (id, oldPass, newPass)=>{
+    const isExisting = await User.findOne({_id: id}).select("+password");
+    if( isExisting ){
+        const isVerified = await bcrypt.compare(oldPass, isExisting.password);
+        if(isVerified){
+            const updates = {"password": newPass};
+            const updatedObj = await User.findOneAndUpdate({ _id: id}, updates);
+            if(updatedObj){
+                return updatedObj;
+            }
+        }else{
+            return "Old password is incorrect!";
+        }
     }
 }
 
@@ -62,11 +77,11 @@ const changePassword = async (validToken, newPass) =>{
 
 const updateUserDetail = async (id, updatedName, updatedEmail)=>{
     try{
-        const updates = { $set: {name: updatedName, email: updatedEmail} };
-        const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, {new:true});
+        const updates = {"name": updatedName, "email": updatedEmail};
+        const updatedObj = await User.findOneAndUpdate({ _id: id}, updates, {runValidators: true, new:true});
         return updatedObj;
     }catch(err){
-        return "User not found!";
+        console.log(err);
     }
 }
 
@@ -74,6 +89,16 @@ const updateUserWithToken = async (objTemp) =>{
     const updatedObj = await User.findOneAndUpdate({ _id: objTemp._id}, objTemp, {new:true}).select("+password");
     if(updatedObj){
         return updatedObj;
+    }
+}
+
+const findUserById = async(id) =>{
+    try{
+        const user = await User.findOne( {_id : id});
+        if(user)
+            return user;
+    }catch(err){
+        console.log(err);
     }
 }
 
@@ -111,3 +136,5 @@ module.exports.updateUserDetail = updateUserDetail;
 module.exports.findUserByEmail = findUserByEmail;
 module.exports.updateUserWithToken = updateUserWithToken;
 module.exports.changePassword = changePassword;
+module.exports.findUserById = findUserById;
+module.exports.updateRole = updateRole;
