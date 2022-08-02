@@ -118,10 +118,9 @@ const updateRating = async (product) =>{
     }
     product.numberOfReviews = product.reviews.length;
     product.rating = (sum) / (product.numberOfReviews);
-    console.log(product);
-    product.save({validateBeforeSave: false});
-    if(product){
-        return product;
+    const prod = await product.save({validateBeforeSave: false});
+    if(prod){
+        return prod;
     }
 }
 
