@@ -20,8 +20,7 @@ const addNewUser = async (newUser) => {
         if(user){
             const result = user;
             return result;
-        }
-        
+        } 
     }catch(err){
         return "Please input all the required data.";
     }
@@ -37,8 +36,7 @@ const deleteUser = async (id)=>{
 }
 
 const updateRole = async (id, role) =>{
-    const updates = {"role":role};
-
+    const updates = {"role" : role};
     const updatedObj = await User.findOneAndUpdate( {id: id}, updates );
     if(updatedObj){
         return updatedObj;
