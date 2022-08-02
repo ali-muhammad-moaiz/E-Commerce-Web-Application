@@ -100,21 +100,27 @@ const addReviewToProduct = async (productId, review) =>{
         for (let x of product.reviews) {
             if(toString(x) === toString(review.customerId)){
                 const temp = await Product.findOneAndUpdate({_id: product._id}, {$pull: {reviews: {customerId: review.customerId}}}, {new: true});
+                temp.save({validateBeforeSave: false});
                 break;
             }
         }
-        
-        product.reviews.push(review);
-        let sum = 0;
-        for (let x of product.reviews){
-            console.log(x);
-            sum+= x.rating;
-        }
-        product.numberOfReviews = product.reviews.length;
+        const tmp = await Product.findOneAndUpdate({_id: product._id}, {$push: {reviews: review}}, {new: true});
+        const updatedObj = await updateRating(tmp);
+        return updatedObj;
+    }
+}
 
-        product.rating = (sum) / (product.numberOfReviews);
-        console.log(sum);
-        product.save({validateBeforeSave: false});
+const updateRating = async (product) =>{
+    let sum = 0;
+    for (let x of product.reviews){
+        console.log(x);
+        sum+= x.rating;
+    }
+    product.numberOfReviews = product.reviews.length;
+    product.rating = (sum) / (product.numberOfReviews);
+    console.log(product);
+    product.save({validateBeforeSave: false});
+    if(product){
         return product;
     }
 }
@@ -124,13 +130,19 @@ const deleteReviewFromProduct = async ( productId, customerId ) => {
     if(!product){
         return;
     }else{
+        let temp;
         for (let x of product.reviews) {
             if(toString(x.customerId) === toString(customerId)){
-                const temp = await Product.findOneAndUpdate({_id: productId}, {$pull: {reviews: {customerId: customerId}}}, {new: true});
+                temp = await Product.findOneAndUpdate({_id: productId}, {$pull: {reviews: {customerId: customerId}}}, {new: true});
                 await product.save({validateBeforeSave: false});
-                return product;
+                break;
             }
         }
+        if(temp){
+            const tmp = await updateRating(temp);
+            return tmp;
+        }
+        return product;
     }
 }
 

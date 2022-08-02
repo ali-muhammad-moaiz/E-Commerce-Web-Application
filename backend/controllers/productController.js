@@ -67,14 +67,14 @@ const addReviewController = async (req, res) =>{
     const review = {
         customerId: customer,
         name: customerName,
-        rating: rating,
+        rating: Number(rating),
         comment: comment
     }
 
     const result = await addReviewToProduct(product, review);
     if(!result)
         return res.status(404).json({'message':result2});
-    return res.status(201).json({'message':result});
+    return res.status(200).json({'message':result});
 }
 
 const deleteReviewController = async (req, res) =>{
@@ -91,10 +91,10 @@ const getProductReviewsController = async (req, res) =>{
     const pid = req.query.pid;
     const productReviews = await findProduct(pid);
 
-    if(productReviews){
-        return res.status(201).json({'message':productReviews});
+    if(!productReviews){
+        return res.status(404).json({'message':result2});
     }
-    return res.status(404).json({'message':result2});
+    return res.status(201).json({'message':productReviews});
 }
 
 module.exports.getProductReviewsController = getProductReviewsController;

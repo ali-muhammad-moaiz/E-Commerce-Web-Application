@@ -14,7 +14,7 @@ router.get('/search', getProductByKeywordController);
 router.get('/search/price', getProductByPriceRangeKeyController);
 router.get('/reviews', getProductReviewsController);
 
-router.put('/reviews/update', isAuthenticUser, addReviewController);                            //add by query
+router.put('/reviews/add', isAuthenticUser, addReviewController);                            //add by query
 router.put('/reviews/delete', isAuthenticUser, deleteReviewController);
 
 module.exports = router;
