@@ -34,9 +34,7 @@ class ApiFeatures{
 
     filter(removeFieldsList){
         const queryCopy = { ...this.queryStr};
-       
         removeFieldsList.forEach(element => delete queryCopy[element]);
-
         this.query = this.query.find({queryCopy});
         return this;
     }

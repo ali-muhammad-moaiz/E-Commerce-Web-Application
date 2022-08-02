@@ -1,10 +1,10 @@
+const { find } = require('../models/productModel.js');
 const Product = require('../models/productModel.js');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;
 
 const getProductsByKeywordCategory = async (queryStr, opt)=>{
     const apiFeature = new ApiFeatures(Product.find({}), queryStr).search(opt);
-    
     try{
         const products = apiFeature.query;
         return products;
@@ -16,8 +16,7 @@ const getProductsByKeywordCategory = async (queryStr, opt)=>{
 const searchProduct = async (key, page)=>{
     const currentPage = page || 1;
     const skip = RESULTSPERPAGE * (currentPage - 1); 
-    const productCount = await Product.countDocuments();
-    
+    const productCount = await Product.countDocuments(); 
     try{
         const objRes = await Product.find( { $or: [ {name:{'$regex' : key, '$options' : 'i'}},  {category: key}, {description:{'$regex' : key, '$options' : 'i'}} ] }).limit(RESULTSPERPAGE).skip(skip);
         return objRes;
@@ -29,10 +28,8 @@ const searchProduct = async (key, page)=>{
 const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan, page) =>{
     const currentPage = page || 1;
     const productCount = await Product.countDocuments();
-
     try{
         const skip = RESULTSPERPAGE * (currentPage - 1);   
-
         if(key){
             const obj = await Product.find( { $and: [ {name:{'$regex' : key, '$options' : 'i'}},  {price: {$gt : greaterThan, $lt :  lesserThan}} ] }).limit(RESULTSPERPAGE).skip(skip);
             return obj;
@@ -95,9 +92,53 @@ const updateProduct = async (id, updates)=>{
     }
 }
 
+const addReviewToProduct = async (productId, review) =>{
+    const product = await Product.findOne({_id : productId});
+    if(!product){
+        return;
+    }else{
+        for (let x of product.reviews) {
+            if(toString(x) === toString(review.customerId)){
+                const temp = await Product.findOneAndUpdate({_id: product._id}, {$pull: {reviews: {customerId: review.customerId}}}, {new: true});
+                break;
+            }
+        }
+        
+        product.reviews.push(review);
+        let sum = 0;
+        for (let x of product.reviews){
+            console.log(x);
+            sum+= x.rating;
+        }
+        product.numberOfReviews = product.reviews.length;
+
+        product.rating = (sum) / (product.numberOfReviews);
+        console.log(sum);
+        product.save({validateBeforeSave: false});
+        return product;
+    }
+}
+
+const deleteReviewFromProduct = async ( productId, customerId ) => {
+    const product = await Product.findOne({_id : productId});
+    if(!product){
+        return;
+    }else{
+        for (let x of product.reviews) {
+            if(toString(x.customerId) === toString(customerId)){
+                const temp = await Product.findOneAndUpdate({_id: productId}, {$pull: {reviews: {customerId: customerId}}}, {new: true});
+                await product.save({validateBeforeSave: false});
+                return product;
+            }
+        }
+    }
+}
+
 module.exports.addNewProduct = addNewProduct;
 module.exports.deleteProduct = deleteProduct;
 module.exports.updateProduct = updateProduct;
 module.exports.findProduct = findProduct;
+module.exports.addReviewToProduct = addReviewToProduct;
+module.exports.deleteReviewFromProduct = deleteReviewFromProduct;
 module.exports.searchProductByPriceRangeKey = searchProductByPriceRangeKey;
-module.exports.searchProduct = searchProduct;           //for getting the product by key = Name || Category
+module.exports.searchProduct = searchProduct;               //for getting the product by key = Name || Category

@@ -2,42 +2,39 @@ const {addNewUser, validateCredentials, deleteUser, getAllUser, updateRole, find
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
 const {sendEmail} = require('../utils/sendEmail');
+ 
 const result2 = "No such user exists!";
 
 const registerUserController = async (req, res) =>{
     const {user} = req.body;
     user.password = await bcrypt.hash(user.password, 12);
     const result = await addNewUser(user);
-    
     if(!result || !result.email)
         return res.status(400).json({'message':"Unable to add the user!"});
-    
+
     const token_options = await getToken(result);     //result is payload for token
     const token = token_options[0];
     const options = token_options[1];
-
     return res.status(201).cookie('token', token, options).json({success: true, result, token}); 
 }
 
 const deleteUserController = async (req, res) =>{     //by admin
     const {id} = req.params;
-
     const result = await deleteUser(id);
     if(!result)
         return res.status(404).json({'message':result2});
-
-    return res.status(200).json({'message':result}); 
+ 
+    return res.status(204).json({'message':result}); 
 }
 
 const updateUserRoleController = (req, res) =>{
     const {role} = req.body;
     const id = req.params.id;
-
     const result = updateRole(id, role);
     if(!result){
         return res.status(404).json({'message':result2});
     }
-    return res.status(200).json({'message':result}); 
+    return res.status(204).json({'message':result}); 
 }
 
 const deleteProfileController = async (req, res) => {       //by the user himself
@@ -49,7 +46,7 @@ const deleteProfileController = async (req, res) => {       //by the user himsel
 
         res.clearCookie('token');
         console.log("User deleted from database.");
-        return res.status(200).json({'message':result}); 
+        return res.status(204).json({'message':result}); 
     }
     return res.status(404).json({'message': "Something went wrong!"});
 }
@@ -57,19 +54,15 @@ const deleteProfileController = async (req, res) => {       //by the user himsel
 const getPersonalDetailsController = async(req, res) => {
     const id = req.user._id;
     const result = await findUserById(id);
-
     if(!result)
         return res.status(404).json({'message':result2});
-
     return res.status(200).json({success: true, result});
 }
 
 const updateUserProfileController = async (req, res) =>{
     const {name, email} = req.body;
     const id = req.user.id;
-
     const result = await updateUserDetail(id, name, email);
-
     if(!result){
         return res.status(401).json({'message':"Something went wrong!"});
     }
@@ -77,28 +70,24 @@ const updateUserProfileController = async (req, res) =>{
     const token_options = await getToken(result);     //valid is payload for token
     const token = token_options[0];
     const options = token_options[1];
-    
-    return res.status(201).cookie('token', token, options).json({success: true, result, token});
+    return res.status(204).cookie('token', token, options).json({success: true, result, token});
 }
 
 const updateUserPasswordController = async (req, res) =>{
     const {oldPassword, newPassword, confirmPassword} = req.body;
-
     if(newPassword == confirmPassword){
         const hashedPass = await bcrypt.hash(newPassword, 12);
-
         const result = await updateUserPass(req.user.id, oldPassword, hashedPass);
         if(!result ){
             return res.status(404).json({'message':result2});
         }else if( result &&  !result.email){
             return res.status(401).json({'message':result});
         }
-        
+
         const token_options = await getToken(result);     //result is payload for token
         const token = token_options[0];
         const options = token_options[1];
-        
-        return res.status(201).cookie('token', token, options).json({success: true, result, token});
+        return res.status(204).cookie('token', token, options).json({success: true, result, token});
     }
     return res.status(401).json({'message': "Both passwords are not same!"});
 }
@@ -107,7 +96,6 @@ const getAllUserController = async (req, res) =>{
     const result = await getAllUser();
     if(!result)
         return res.status(404).json({'message':"No users exists!"});
-
     return res.status(200).json({'message':result}); 
 }
 
@@ -116,17 +104,14 @@ const loginUserController = async(req, res, next) => {
 
     if(!email || !password)
         return res.status(401).json({'message':"Please enter email and password both!"});
-    
     const valid = await validateCredentials(email, password);
-
     if(!valid)
         return res.status(401).json({'message':"Please Enter valid Credentials!"});
 
     const token_options = await getToken(valid);
     const token = token_options[0];
     const options = token_options[1];
-
-    return res.status(201).cookie('token', token, options).json({success: true, valid, token});
+    return res.status(200).cookie('token', token, options).json({success: true, valid, token});
 }
 
 const logoutUserController = async(req, res) => {
@@ -134,24 +119,20 @@ const logoutUserController = async(req, res) => {
         expires: new Date(Date.now()),
         httpOnly: true
     });
-
     return res.status(200).json({success: true, message: "Logged out successfully."});
 }
 
 const forgetPassword = async (req, res) =>{
     const modifyUser = await findUserByEmail(req.body.email);
-    
     if(modifyUser){
         await modifyUser.getPasswordResetToken();
         const updatedUser = await updateUserWithToken(modifyUser);
-
         if(!updatedUser){
             return res.status(500).json({'message':result2});
         }
-            
+   
         let url = `${req.protocol}://${req.get("host")}/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
         //`http://localhost:PORT#/api/user/updatePassword/${updatedUser.resetPasswordToken}`;
-
         sendEmail(url, modifyUser.email);
         return res.status(200).json({'message':"Mail sent!"});           
     }
@@ -175,8 +156,7 @@ const changePasswordController = async (req, res) =>{
     const token_options = await getToken(result);     //valid is payload for token
     const token = token_options[0];
     const options = token_options[1];
-
-    return res.status(200).cookie('token', token, options).json({success: true, result, token});
+    return res.status(204).cookie('token', token, options).json({success: true, result, token});
 }
 
 module.exports.registerUserController = registerUserController;
