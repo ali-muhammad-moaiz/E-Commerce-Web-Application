@@ -1,13 +1,11 @@
 const app = require('./app.js');
-const express = require('express');
 const dotenv = require('dotenv');
 const {connectDatabase} = require('./config/database.js');
 
 dotenv.config({path:'backend/config/.env'});
-
 connectDatabase();
 
-const server = app.listen(process.env.PORT, ()=>{
+const server = app.listen(process.env.PORT, () => {
     console.log(`Server is working on http://localhost:${process.env.PORT}`);
 });
 
