@@ -15,7 +15,7 @@ const createNewOrderController = async (req, res) =>{
     const prodTmp = await findProduct(pId);
 
     if(prodTmp){
-        const order = {
+        var order = {
             shippingInfo: {
                 address: req.body.address,
                 city: req.body.city,
@@ -39,14 +39,31 @@ const createNewOrderController = async (req, res) =>{
             shippingPrice: Number(1000), 
             totalPrice: 0
         }
-
         order.totalPrice = Number( order.itemsPrice + order.taxPrice + order.shippingPrice );
-        const result = await addNewOrder(order);
-        if(!result)
-            return res.status(404).json({'message':result2});
-        return res.status(201).json({'message':result});
+    }else{
+        var order = {
+            shippingInfo: {
+                address: req.body.address,
+                city: req.body.city,
+                country: req.body.country,
+                zip: req.body.zip,
+                cellNo: req.body.cellNo,
+            },
+            customer: {
+                userId: req.user._id,
+                userName: req.user.name,
+            },
+            itemsPrice: Number(0),
+            taxPrice: Number(0),      
+            shippingPrice: Number(0), 
+            totalPrice: Number(0)
+        }
     }
-    return res.status(404).json({'message':result2});
+    console.log(order);
+    const result = await addNewOrder(order);
+    if(!result)
+        return res.status(404).json({'message':result2});
+    return res.status(200).json({'message':result});
 }
 
 module.exports.getOrderByIdController = getOrderByIdController;

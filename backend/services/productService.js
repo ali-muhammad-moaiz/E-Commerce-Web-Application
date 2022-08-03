@@ -32,11 +32,9 @@ const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan, page) 
 }
 
 const findProduct = async (id)=>{
-    try{
-        const obj = await Product.findById(id);
+    const obj = await Product.findById(id);
+    if(obj){
         return obj;
-    }catch(err){
-        return "Product not found!";
     }
 }
 
