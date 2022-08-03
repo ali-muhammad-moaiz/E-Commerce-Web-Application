@@ -28,7 +28,7 @@ const createNewOrderController = async (req, res) =>{
             userName: req.user.userName,
         },
 
-        item: {
+        items: {
             productId: pId,
             price: prodTmp.price
         },
