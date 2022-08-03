@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    shippingnfo: {
+    shippingInfo: {
         address: {
             type: String,
             maxLength: 80,
@@ -43,6 +43,18 @@ const orderSchema = new mongoose.Schema({
     paidAt: {
         type: Date
     },
+    items:[
+        {
+            productId: {
+                type:  mongoose.Types.ObjectId,
+                required: true
+            },
+            price: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
     itemsPrice: {
         type: Number,
         required: true
