@@ -1,10 +1,18 @@
 const {addNewProduct, searchProduct, searchProductByPriceRangeKey, deleteReviewFromProduct, addReviewToProduct, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-const {findOrder, addNewOrder} = require('../services/orderService.js');
+const {findOrder, addNewOrder, findOrderById} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
     const {id} = req.user._id;
     const result = await findOrder(id);
+    if(!result)
+        return res.status(404).json({'message':result2});
+    return res.status(200).json({'message':result});
+}
+
+const getSpecificOrderController = async (req, res) =>{                 //for user(customer)
+    const {id} = req.params;
+    const result = await findOrderById(id);
     if(!result)
         return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
@@ -63,4 +71,5 @@ const createNewOrderController = async (req, res) =>{
 }
 
 module.exports.getOrderByIdController = getOrderByIdController;
+module.exports.getSpecificOrderController = getSpecificOrderController;
 module.exports.createNewOrderController = createNewOrderController;

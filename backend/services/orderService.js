@@ -18,5 +18,15 @@ const findOrder = async (userId) =>{
     }
 }
 
+const findOrderById = async (orderId) =>{
+    try{
+        const obj = await Order.findOne({_id:orderId});
+        return obj;
+    }catch(err){
+        console.log(err);
+    }
+}
+
+module.exports.findOrderById = findOrderById;
 module.exports.addNewOrder = addNewOrder;
 module.exports.findOrder = findOrder;
