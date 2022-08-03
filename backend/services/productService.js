@@ -3,16 +3,6 @@ const Product = require('../models/productModel.js');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;
 
-const getProductsByKeywordCategory = async (queryStr, opt)=>{
-    const apiFeature = new ApiFeatures(Product.find({}), queryStr).search(opt);
-    try{
-        const products = apiFeature.query;
-        return products;
-    }catch(err){
-        return "Product not found!";
-    }
-}
-
 const searchProduct = async (key, page)=>{
     const currentPage = page || 1;
     const skip = RESULTSPERPAGE * (currentPage - 1); 

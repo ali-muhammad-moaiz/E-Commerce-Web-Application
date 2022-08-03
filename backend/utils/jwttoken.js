@@ -1,6 +1,4 @@
-const User = require('../models/userModel');
 const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
 dotenv.config({path:'backend/config/.env'});
 
 const sendToken = async (userPayload) => {
