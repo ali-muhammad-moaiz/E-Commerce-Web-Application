@@ -1,4 +1,5 @@
 const Product = require('../models/productModel.js');
+const Order = require('../models/orderModel');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;
 
@@ -132,6 +133,23 @@ const deleteReviewFromProduct = async ( productId, customerId ) => {
     }
 }
 
+const getAllProducts_vendor = async (vendorId) => {
+    const orders = await Order.find();
+    const products = [];
+
+    for(let order of orders){
+        for(items of order.items){
+            const product = await Product.findOne({_id: items.productId});
+            
+            if( JSON.stringify(product.adminId)===JSON.stringify(vendorId) ){
+                products.push(product);
+            }
+        }
+    }
+    return products;
+}
+
+module.exports.getAllProducts_vendor = getAllProducts_vendor;
 module.exports.addNewProduct = addNewProduct;
 module.exports.deleteProduct = deleteProduct;
 module.exports.updateProduct = updateProduct;
