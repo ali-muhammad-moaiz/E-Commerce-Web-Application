@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema({
             required: true
         }
     },
-    user: {
+    customer: {
         userId:{
             type: mongoose.types.ObjectId,
             required: true,
