@@ -1,5 +1,5 @@
 const {addNewProduct, searchProduct, searchProductByPriceRangeKey, deleteReviewFromProduct, addReviewToProduct, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-const {findOrder, addNewOrder, findOrderById, addProductToOrder, removeProductFromOrder} = require('../services/orderService.js');
+const {findOrder, addNewOrder, deleteOrder, findOrderById, addProductToOrder, removeProductFromOrder} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
@@ -90,8 +90,22 @@ const removeProductFromOrderController = async (req, res) =>{
     return res.status(204).json({'message':result});
 }
 
+const deleteOrderController = async (req, res) => {       //by the user himself
+    if(req.params.id){
+        const id = req.params.id;
+        const result = await deleteOrder(id);
+        if(!result){
+            return res.status(404).json({'message':result2});
+        }
+        console.log("Order deleted from database.");
+        return res.status(204).json({'message':result}); 
+    }
+    return res.status(404).json({'message': "Something went wrong!"});
+}
+
 module.exports.removeProductFromOrderController = removeProductFromOrderController;
 module.exports.addProductToOrderController = addProductToOrderController;
 module.exports.getOrderByIdController = getOrderByIdController;
 module.exports.getSpecificOrderController = getSpecificOrderController;
 module.exports.createNewOrderController = createNewOrderController;
+module.exports.deleteOrderController = deleteOrderController;

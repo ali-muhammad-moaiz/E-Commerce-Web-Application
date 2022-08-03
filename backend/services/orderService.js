@@ -59,6 +59,13 @@ const updatePrices = async (orderObj) =>{
     return result;
 }
 
+const deleteOrder = async (id)=>{
+    try{
+        const deletedObj = await Order.findOneAndDelete({ _id: id });
+        return deletedObj;
+    }catch(err){}
+}
+
 const removeProductFromOrder = async (orderId, productId) =>{
     const product = await Product.findById(productId);
     if(product){
@@ -81,3 +88,4 @@ module.exports.addProductToOrder = addProductToOrder;
 module.exports.findOrderById = findOrderById;
 module.exports.addNewOrder = addNewOrder;
 module.exports.findOrder = findOrder;
+module.exports.deleteOrder = deleteOrder;
