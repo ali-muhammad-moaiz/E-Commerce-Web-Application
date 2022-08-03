@@ -23,17 +23,14 @@ const createNewOrderController = async (req, res) =>{
                 zip: req.body.zip,
                 cellNo: req.body.cellNo,
             },
-
             customer: {
                 userId: req.user._id,
                 userName: req.user.name,
             },
-
             items: {
                 productId: pId,
                 price: Number(prodTmp.price)
             },
-
             itemsPrice: Number(prodTmp.price),
             taxPrice: Number(prodTmp.price)*18/100,      //assumed tax as 18%
             shippingPrice: Number(1000), 
@@ -59,7 +56,6 @@ const createNewOrderController = async (req, res) =>{
             totalPrice: Number(0)
         }
     }
-    console.log(order);
     const result = await addNewOrder(order);
     if(!result)
         return res.status(404).json({'message':result2});
