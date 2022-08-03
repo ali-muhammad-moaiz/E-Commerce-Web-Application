@@ -1,5 +1,5 @@
 const {addNewProduct, searchProduct, searchProductByPriceRangeKey, deleteReviewFromProduct, addReviewToProduct, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-const {findOrder, addNewOrder, findOrderById} = require('../services/orderService.js');
+const {findOrder, addNewOrder, findOrderById, addProductToOrder, removeProductFromOrder} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
@@ -70,6 +70,28 @@ const createNewOrderController = async (req, res) =>{
     return res.status(200).json({'message':result});
 }
 
+const addProductToOrderController = async (req, res) =>{
+    const productId = req.body.pid;
+    const orderId = req.params.id;
+    
+    const result = await addProductToOrder(orderId, productId);
+    if(!result)
+        return res.status(404).json({'message': "Something went wrong!"});
+    return res.status(204).json({'message':result});
+}
+
+const removeProductFromOrderController = async (req, res) =>{
+    const productId = req.body.pid;
+    const orderId = req.params.id;
+    
+    const result = await removeProductFromOrder(orderId, productId);
+    if(!result)
+        return res.status(404).json({'message': "Something went wrong!"});
+    return res.status(204).json({'message':result});
+}
+
+module.exports.removeProductFromOrderController = removeProductFromOrderController;
+module.exports.addProductToOrderController = addProductToOrderController;
 module.exports.getOrderByIdController = getOrderByIdController;
 module.exports.getSpecificOrderController = getSpecificOrderController;
 module.exports.createNewOrderController = createNewOrderController;
