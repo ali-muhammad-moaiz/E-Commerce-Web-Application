@@ -1,4 +1,3 @@
-const { find } = require('../models/productModel.js');
 const Product = require('../models/productModel.js');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;

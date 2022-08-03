@@ -3,7 +3,7 @@ const {findOrder, addNewOrder} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
-    const {id} = req.query;
+    const {id} = req.user._id;
     const result = await findOrder(id);
     if(!result)
         return res.status(404).json({'message':result2});
@@ -11,39 +11,42 @@ const getOrderByIdController = async (req, res) =>{                 //for user(c
 }
 
 const createNewOrderController = async (req, res) =>{
-    const pId = req.body.pId; //product Id
+    const pId = req.body.productId; //product Id
     const prodTmp = await findProduct(pId);
 
-    const product = {
-        shippingInfo: {
-            address: req.body.address,
-            city: req.body.city,
-            country: req.body.country,
-            zip: req.body.zip,
-            cellNo: req.body.cellNo,
-        },
+    if(prodTmp){
+        const order = {
+            shippingInfo: {
+                address: req.body.address,
+                city: req.body.city,
+                country: req.body.country,
+                zip: req.body.zip,
+                cellNo: req.body.cellNo,
+            },
 
-        customer: {
-            userId: req.user._id,
-            userName: req.user.userName,
-        },
+            customer: {
+                userId: req.user._id,
+                userName: req.user.name,
+            },
 
-        items: {
-            productId: pId,
-            price: prodTmp.price
-        },
+            items: {
+                productId: pId,
+                price: Number(prodTmp.price)
+            },
 
-        itemsPrice: prodTmp.price,
-        taxPrice: itemsPrice*18/100,      //assumed tax as 18%
-        shippingPrice: 1000, 
-        totalPrice: itemsPrice + taxPrice + shippingPrice
+            itemsPrice: Number(prodTmp.price),
+            taxPrice: Number(prodTmp.price)*18/100,      //assumed tax as 18%
+            shippingPrice: Number(1000), 
+            totalPrice: 0
+        }
+
+        order.totalPrice = Number( order.itemsPrice + order.taxPrice + order.shippingPrice );
+        const result = await addNewOrder(order);
+        if(!result)
+            return res.status(404).json({'message':result2});
+        return res.status(201).json({'message':result});
     }
-    
-    const result = await addNewOrder(pId, product);
-    if(!result)
-        return res.status(400).json({'message':result2});
-    console.log("Product added in database.");
-    return res.status(201).json({'message':result});
+    return res.status(404).json({'message':result2});
 }
 
 module.exports.getOrderByIdController = getOrderByIdController;

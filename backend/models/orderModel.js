@@ -23,14 +23,14 @@ const orderSchema = new mongoose.Schema({
             required: true
         },
         cellNo: {
-            tpye: String,
+            type: String,
             maxLength: 20,
             required: true
         }
     },
     customer: {
         userId:{
-            type: mongoose.types.ObjectId,
+            type: mongoose.Types.ObjectId,
             required: true,
             ref: "User"
         },
@@ -85,4 +85,4 @@ const orderSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.model("Order", orderSchema);
