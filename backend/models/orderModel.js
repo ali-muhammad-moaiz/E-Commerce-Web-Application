@@ -51,18 +51,6 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    images: [
-        {
-            product_id: {
-                type: String,
-                required: true
-            },
-            url: {
-                type: String,
-                required: true
-            }
-        }
-    ],
     shippingPrice: {
         type: Number,
         required: true
