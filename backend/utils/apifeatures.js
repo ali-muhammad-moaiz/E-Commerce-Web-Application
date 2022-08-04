@@ -13,9 +13,7 @@ class ApiFeatures{
                     $regex: this.queryStr.keyword,
                     $options: "i"
                 }
-            }:{                                                 
-                //if keyword is not defined
-            }
+            }:{  /*if keyword is not defined */ }
             this.query = this.query.find({...keyword});
         }
         else if(field === "0"){

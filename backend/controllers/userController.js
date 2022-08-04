@@ -1,8 +1,8 @@
 const {addNewUser, validateCredentials, deleteUser, getAllUser, updateRole, findUserById, updateUserPass, changePassword, updateUserWithToken, updateUserDetail, findUserByEmail} = require('../services/userService');
+const {getAllProducts_vendor} = require('../services/productService.js');
 const bcrypt = require('bcryptjs');
 const {getToken} = require('../utils/jwttoken');
 const {sendEmail} = require('../utils/sendEmail');
- 
 const result2 = "No such user exists!";
 
 const registerUserController = async (req, res) =>{
@@ -101,7 +101,6 @@ const getAllUserController = async (req, res) =>{
 
 const loginUserController = async(req, res, next) => {
     const {email, password} = req.body;
-
     if(!email || !password)
         return res.status(401).json({'message':"Please enter email and password both!"});
     const valid = await validateCredentials(email, password);
@@ -159,6 +158,16 @@ const changePasswordController = async (req, res) =>{
     return res.status(204).cookie('token', token, options).json({success: true, result, token});
 }
 
+const totalSellingController = async (req, res) =>{     //to get all the products sold by vendor
+    const adminId = req.user._id;
+    const products = await getAllProducts_vendor(adminId);
+    if(products.length === 0){
+        return res.status(404).json({'message':"You haven't sold any items yet."});
+    }
+    return res.status(200).json({products});
+}
+
+module.exports.totalSellingController = totalSellingController;
 module.exports.registerUserController = registerUserController;
 module.exports.loginUserController = loginUserController;
 module.exports.logoutUserController = logoutUserController;

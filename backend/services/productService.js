@@ -1,17 +1,7 @@
-const { find } = require('../models/productModel.js');
 const Product = require('../models/productModel.js');
+const Order = require('../models/orderModel');
 const {ApiFeatures} = require('../utils/apifeatures');
 const RESULTSPERPAGE = 5;
-
-const getProductsByKeywordCategory = async (queryStr, opt)=>{
-    const apiFeature = new ApiFeatures(Product.find({}), queryStr).search(opt);
-    try{
-        const products = apiFeature.query;
-        return products;
-    }catch(err){
-        return "Product not found!";
-    }
-}
 
 const searchProduct = async (key, page)=>{
     const currentPage = page || 1;
@@ -43,11 +33,9 @@ const searchProductByPriceRangeKey = async (key, greaterThan, lesserThan, page) 
 }
 
 const findProduct = async (id)=>{
-    try{
-        const obj = await Product.findById(id);
+    const obj = await Product.findById(id);
+    if(obj){
         return obj;
-    }catch(err){
-        return "Product not found!";
     }
 }
 
@@ -98,7 +86,7 @@ const addReviewToProduct = async (productId, review) =>{
         return;
     }else{
         for (let x of product.reviews) {
-            if(toString(x) === toString(review.customerId)){
+            if(JSON.stringify(x.customerId) === JSON.stringify(review.customerId)){
                 const temp = await Product.findOneAndUpdate({_id: product._id}, {$pull: {reviews: {customerId: review.customerId}}}, {new: true});
                 temp.save({validateBeforeSave: false});
                 break;
@@ -131,7 +119,7 @@ const deleteReviewFromProduct = async ( productId, customerId ) => {
     }else{
         let temp;
         for (let x of product.reviews) {
-            if(toString(x.customerId) === toString(customerId)){
+            if(JSON.stringify(x.customerId) === JSON.stringify(customerId)){
                 temp = await Product.findOneAndUpdate({_id: productId}, {$pull: {reviews: {customerId: customerId}}}, {new: true});
                 await product.save({validateBeforeSave: false});
                 break;
@@ -145,6 +133,23 @@ const deleteReviewFromProduct = async ( productId, customerId ) => {
     }
 }
 
+const getAllProducts_vendor = async (vendorId) => {
+    const orders = await Order.find();
+    const products = [];
+
+    for(let order of orders){
+        for(items of order.items){
+            const product = await Product.findOne({_id: items.productId});
+            
+            if( JSON.stringify(product.adminId)===JSON.stringify(vendorId) ){
+                products.push(product);
+            }
+        }
+    }
+    return products;
+}
+
+module.exports.getAllProducts_vendor = getAllProducts_vendor;
 module.exports.addNewProduct = addNewProduct;
 module.exports.deleteProduct = deleteProduct;
 module.exports.updateProduct = updateProduct;

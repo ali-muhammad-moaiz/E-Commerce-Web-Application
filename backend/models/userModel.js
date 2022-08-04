@@ -55,10 +55,9 @@ userSchema.methods.getJWTToken = function(){
 
 userSchema.methods.getPasswordResetToken = function(){      //returns entire updated object
     const resetToken = crypto.randomBytes(20).toString("hex");
-
+    
     this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; //to convert into milliseconds 
-
     return this;
 }
 

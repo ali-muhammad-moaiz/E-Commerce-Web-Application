@@ -2,8 +2,7 @@ const User = require('../models/userModel.js');
 const bcrypt = require('bcryptjs');
 
 const addNewUser = async (newUser) => {
-    const addUser = new User(
-        {
+    const addUser = new User({
             name: newUser.name,
             email: newUser.email,
             password: newUser.password,

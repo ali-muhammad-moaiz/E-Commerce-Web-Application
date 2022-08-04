@@ -63,7 +63,6 @@ const addReviewController = async (req, res) =>{
     const { comment } = req.body;
     const rating = Number( req.body.rating);
     const product = req.query.pid;
-
     const review = {
         customerId: customer,
         name: customerName,
