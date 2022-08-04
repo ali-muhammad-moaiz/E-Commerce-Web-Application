@@ -86,7 +86,7 @@ const addReviewToProduct = async (productId, review) =>{
         return;
     }else{
         for (let x of product.reviews) {
-            if(toString(x) === toString(review.customerId)){
+            if(JSON.stringify(x.customerId) === JSON.stringify(review.customerId)){
                 const temp = await Product.findOneAndUpdate({_id: product._id}, {$pull: {reviews: {customerId: review.customerId}}}, {new: true});
                 temp.save({validateBeforeSave: false});
                 break;
@@ -119,7 +119,7 @@ const deleteReviewFromProduct = async ( productId, customerId ) => {
     }else{
         let temp;
         for (let x of product.reviews) {
-            if(toString(x.customerId) === toString(customerId)){
+            if(JSON.stringify(x.customerId) === JSON.stringify(customerId)){
                 temp = await Product.findOneAndUpdate({_id: productId}, {$pull: {reviews: {customerId: customerId}}}, {new: true});
                 await product.save({validateBeforeSave: false});
                 break;
