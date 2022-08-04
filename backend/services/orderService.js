@@ -108,6 +108,18 @@ const updateOrderDetails = async (orderId, updates) =>{
     }
 }
 
+const updateOrderStatus = async (orderId, status) =>{
+    const order = await Order.findOne({_id: orderId});
+    if(order){
+        if(order.orderStatus!='delivered'){
+            const orderUpdated = await Order.findOneAndUpdate({_id: orderId}, {orderStatus: status}, {new: true});
+            if(orderUpdated){
+                return orderUpdated;
+            }
+        }
+    }
+}
+
 module.exports.removeProductFromOrder = removeProductFromOrder;
 module.exports.addProductToOrder = addProductToOrder;
 module.exports.findOrderById = findOrderById;
@@ -116,3 +128,4 @@ module.exports.findOrder = findOrder;
 module.exports.deleteOrder = deleteOrder;
 module.exports.cancelOrder = cancelOrder;
 module.exports.updateOrderDetails = updateOrderDetails;
+module.exports.updateOrderStatus = updateOrderStatus

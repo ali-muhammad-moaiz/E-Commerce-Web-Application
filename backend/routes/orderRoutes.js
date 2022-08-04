@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createNewOrderController, deleteOrderController, updateOrderDetailsController, cancelOrderController, getOrderByIdController, getSpecificOrderController, addProductToOrderController, removeProductFromOrderController} = require('../controllers/orderController.js');
+const {createNewOrderController, deleteOrderController, updateOrderDetailsController, updateOrderStatusController, cancelOrderController, getOrderByIdController, getSpecificOrderController, addProductToOrderController, removeProductFromOrderController} = require('../controllers/orderController.js');
 const {isAuthenticUser, authorizeRoles} = require('../middlewares/auth.js');
 const { updateOrderDetails } = require('../services/orderService.js');
 
@@ -11,6 +11,7 @@ router.put('/update/add/:id', isAuthenticUser, addProductToOrderController);
 router.put('/update/remove/:id', isAuthenticUser, removeProductFromOrderController);
 router.put('/cancel/:id', isAuthenticUser, cancelOrderController);
 router.put('/update/:id', isAuthenticUser, authorizeRoles("admin"), updateOrderDetailsController);
+router.put('/update/status/:id', isAuthenticUser, authorizeRoles("admin"), updateOrderStatusController);
 router.delete('/:id', isAuthenticUser, authorizeRoles("admin"), deleteOrderController);
 
 module.exports = router;

@@ -1,5 +1,5 @@
-const {addNewProduct, searchProduct, searchProductByPriceRangeKey, deleteReviewFromProduct, addReviewToProduct, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-const {findOrder, addNewOrder, deleteOrder, findOrderById, addProductToOrder, updateOrderDetails, cancelOrder, removeProductFromOrder} = require('../services/orderService.js');
+const {findProduct} = require('../services/productService');
+const {findOrder, addNewOrder, deleteOrder, findOrderById, addProductToOrder, updateOrderStatus, updateOrderDetails, cancelOrder, removeProductFromOrder} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
@@ -86,7 +86,7 @@ const addProductToOrderController = async (req, res) =>{
     const result = await addProductToOrder(orderId, productId);
     if(!result)
         return res.status(404).json({'message': "Something went wrong!"});
-    return res.status(204).json({'message':result});
+    return res.status(200).json({'message':result});
 }
 
 const removeProductFromOrderController = async (req, res) =>{
@@ -96,7 +96,7 @@ const removeProductFromOrderController = async (req, res) =>{
     const result = await removeProductFromOrder(orderId, productId);
     if(!result)
         return res.status(404).json({'message': "Something went wrong!"});
-    return res.status(204).json({'message':result});
+    return res.status(200).json({'message':result});
 }
 
 const deleteOrderController = async (req, res) => {       //by the user himself
@@ -107,7 +107,7 @@ const deleteOrderController = async (req, res) => {       //by the user himself
             return res.status(404).json({'message':result2});
         }
         console.log("Order deleted from database.");
-        return res.status(204).json({'message':result}); 
+        return res.status(200).json({'message':result}); 
     }
     return res.status(404).json({'message': "Something went wrong!"});
 }
@@ -119,11 +119,25 @@ const cancelOrderController = async (req, res) =>{
         if(!result){
             return res.status(404).json({'message':result2});
         }1
-        return res.status(204).json({'message':result}); 
+        return res.status(200).json({'message':result}); 
     }
     return res.status(404).json({'message': "Something went wrong!"});
 }
 
+const updateOrderStatusController = async (req, res) =>{            //for admin
+    if(req.params.id && req.body.status){
+        const id = req.params.id;
+        const status = req.body.status;
+        const result = await updateOrderStatus(id, status);
+        if(!result){
+            return res.status(404).json({'message': "Something went wrong!"});
+        }1
+        return res.status(200).json({'message':result}); 
+    }
+    return res.status(404).json({'message': "Something went wrong!"});
+}
+
+module.exports.updateOrderStatusController = updateOrderStatusController;
 module.exports.removeProductFromOrderController = removeProductFromOrderController;
 module.exports.addProductToOrderController = addProductToOrderController;
 module.exports.getOrderByIdController = getOrderByIdController;
