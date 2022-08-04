@@ -1,21 +1,30 @@
 const {addNewProduct, searchProduct, searchProductByPriceRangeKey, deleteReviewFromProduct, addReviewToProduct, findProduct, deleteProduct, updateProduct} = require('../services/productService');
-const {findOrder, addNewOrder, deleteOrder, findOrderById, addProductToOrder, removeProductFromOrder} = require('../services/orderService.js');
+const {findOrder, addNewOrder, deleteOrder, findOrderById, addProductToOrder, updateOrderDetails, cancelOrder, removeProductFromOrder} = require('../services/orderService.js');
 const result2 = "No such order found!";
 
 const getOrderByIdController = async (req, res) =>{                 //for user(customer)
-    const {id} = req.user._id;
+    const id = req.user._id;
     const result = await findOrder(id);
     if(!result)
         return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
 }
 
-const getSpecificOrderController = async (req, res) =>{                 //for user(customer)
+const getSpecificOrderController = async (req, res) =>{   
     const {id} = req.params;
     const result = await findOrderById(id);
     if(!result)
         return res.status(404).json({'message':result2});
     return res.status(200).json({'message':result});
+}
+
+const updateOrderDetailsController = async (req, res) =>{
+    const orderId = req.params.id;
+    const {updates} = req.body;
+    const result = await updateOrderDetails(orderId, updates);
+    if(!result)
+        return res.status(404).json({'message': "Something went wrong!"});
+    return res.status(204).json({'message':result});
 }
 
 const createNewOrderController = async (req, res) =>{
@@ -103,9 +112,23 @@ const deleteOrderController = async (req, res) => {       //by the user himself
     return res.status(404).json({'message': "Something went wrong!"});
 }
 
+const cancelOrderController = async (req, res) =>{
+    if(req.params.id){
+        const id = req.params.id;
+        const result = await cancelOrder(id);
+        if(!result){
+            return res.status(404).json({'message':result2});
+        }1
+        return res.status(204).json({'message':result}); 
+    }
+    return res.status(404).json({'message': "Something went wrong!"});
+}
+
 module.exports.removeProductFromOrderController = removeProductFromOrderController;
 module.exports.addProductToOrderController = addProductToOrderController;
 module.exports.getOrderByIdController = getOrderByIdController;
 module.exports.getSpecificOrderController = getSpecificOrderController;
 module.exports.createNewOrderController = createNewOrderController;
 module.exports.deleteOrderController = deleteOrderController;
+module.exports.cancelOrderController = cancelOrderController;
+module.exports.updateOrderDetailsController = updateOrderDetailsController;

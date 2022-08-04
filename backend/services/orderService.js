@@ -12,8 +12,14 @@ const addNewOrder = async (order) =>{
 
 const findOrder = async (userId) =>{
     try{
-        const obj = await Order.find({userId});
-        return obj;
+        const obj = await Order.find({});
+        let orders = [];
+        for(let tmp of obj){
+            if(JSON.stringify(tmp.customer.userId) === JSON.stringify(userId)){
+                orders.push(tmp);
+            }
+        }
+        return orders;
     }catch(err){
         console.log(err);
     }
@@ -83,9 +89,30 @@ const removeProductFromOrder = async (orderId, productId) =>{
     }
 }
 
+const cancelOrder = async (orderId) =>{
+    const order = await Order.findOne({_id: orderId});
+    if(order){    
+        if( (order.orderStatus!='shipped') && (order.orderStatus!='delivered') ){
+            const orderUpdated = await Order.findOneAndUpdate({_id: orderId}, {orderStatus:'cancelled'}, {new: true});
+            if(orderUpdated){
+                return orderUpdated;
+            }
+        }
+    }
+}
+
+const updateOrderDetails = async (orderId, updates) =>{
+    const orderUpdated = await Order.findOneAndUpdate({_id: orderId}, updates, {new: true});
+    if(orderUpdated){
+        return orderUpdated;
+    }
+}
+
 module.exports.removeProductFromOrder = removeProductFromOrder;
 module.exports.addProductToOrder = addProductToOrder;
 module.exports.findOrderById = findOrderById;
 module.exports.addNewOrder = addNewOrder;
 module.exports.findOrder = findOrder;
 module.exports.deleteOrder = deleteOrder;
+module.exports.cancelOrder = cancelOrder;
+module.exports.updateOrderDetails = updateOrderDetails;
