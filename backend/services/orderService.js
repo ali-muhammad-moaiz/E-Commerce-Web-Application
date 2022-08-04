@@ -114,7 +114,18 @@ const updateOrderStatus = async (orderId, status) =>{
         if(order.orderStatus!='delivered'){
             const orderUpdated = await Order.findOneAndUpdate({_id: orderId}, {orderStatus: status}, {new: true});
             if(orderUpdated){
-                return orderUpdated;
+                for (let item of orderUpdated.items){
+                    const product = await Product.findOne({_id: item.productId});
+                    if(product){
+                        if(product.stock>0){
+                            const stock = product.stock-1;
+                            const productUpdated = await Product.findOneAndUpdate({_id: product._id}, {stock: stock}, {new: true});
+                            if(productUpdated){
+                                return orderUpdated;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
